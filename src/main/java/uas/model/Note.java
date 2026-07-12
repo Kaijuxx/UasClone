@@ -15,10 +15,8 @@ public class Note {
     private boolean isPinned;   
     private String reminderTime; 
 
-    // Constructor Kosong (Wajib ada buat JPA/Hibernate)
     public Note() {}
 
-    // Constructor Lengkap (Biar NoteServiceTest.java gak eror)
     public Note(Long id, String title, String content, boolean isTodo, boolean isCompleted, boolean isPinned, String reminderTime) {
         this.id = id;
         this.title = title;
@@ -29,7 +27,6 @@ public class Note {
         this.reminderTime = reminderTime;
     }
 
-    // Getter dan Setter Manual (Pengganti @Data Lombok)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     

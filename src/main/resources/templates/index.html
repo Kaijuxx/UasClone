@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Google Keep Clone - UAS</title>
+    <title>Keep Clone</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light p-4">
@@ -10,14 +10,27 @@
 
         <!-- Form Tambah Catatan -->
         <div class="card p-3 mb-4 shadow-sm">
-            <form th:action="@{/save}" th:object="${newNote}" method="POST">
+            <form th:action="@{/save}" th:object="${newNote}" method="POST" id="mainForm">
                 <input type="text" th:field="*{title}" class="form-control mb-2" placeholder="Judul..." required>
-                <textarea th:field="*{content}" class="form-control mb-2" placeholder="Tulis catatan atau item todo..."></textarea>
+                
+                <div id="text-note-section">
+                    <textarea id="textContent" name="content" class="form-control mb-2" placeholder="Tulis catatan..."></textarea>
+                </div>
+                
+                <div id="todo-note-section" class="mb-2" style="display: none;">
+                    <div id="todo-inputs-container">
+                        <div class="input-group mb-2 todo-input-item">
+                            <span class="input-group-text">☐</span>
+                            <input type="text" class="form-control todo-item-field" placeholder="Item todo 1...">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addTodoField()">+ Tambah Item Todo</button>
+                </div>
                 
                 <div class="row g-2 align-items-center mb-2">
                     <div class="col-auto">
                         <div class="form-check">
-                            <input type="checkbox" th:field="*{todo}" class="form-check-input" id="isTodo">
+                            <input type="checkbox" th:field="*{todo}" class="form-check-input" id="isTodo" onchange="toggleFormMode(this.checked)">
                             <label class="form-check-label" for="isTodo">ToDo List</label>
                         </div>
                     </div>
@@ -25,7 +38,7 @@
                         <input type="datetime-local" th:field="*{reminderTime}" class="form-control form-control-sm" title="Set Pengingat">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-warning w-100 fw-bold">Simpan</button>
+                <button type="submit" class="btn btn-warning w-100 fw-bold" onclick="prepareSubmit(event)">Simpan</button>
             </form>
         </div>
 
@@ -39,11 +52,13 @@
                             <a th:href="@{'/pin/' + ${note.id}}" class="btn btn-sm" th:classappend="${note.isPinned} ? 'btn-warning' : 'btn-outline-secondary'">📌</a>
                         </div>
                         
-                        <div th:if="${note.isTodo}" class="form-check my-2">
-                            <a th:href="@{'/toggle-todo/' + ${note.id}}" class="text-decoration-none text-dark">
-                                <input type="checkbox" th:checked="${note.isCompleted}" class="form-check-input">
-                                <span th:text="${note.content}" th:style="${note.isCompleted} ? 'text-decoration: line-through;' : ''">Isi Todo</span>
-                            </a>
+                        <div th:if="${note.isTodo}" class="my-2">
+                            <div th:each="item : ${#strings.arraySplit(note.content, ',')}" class="form-check mb-1">
+                                <a th:href="@{'/toggle-todo/' + ${note.id}}" class="text-decoration-none text-dark">
+                                    <input type="checkbox" th:checked="${note.isCompleted}" class="form-check-input">
+                                    <span th:text="${item}" th:style="${note.isCompleted} ? 'text-decoration: line-through;' : ''">Isi Todo</span>
+                                </a>
+                            </div>
                         </div>
                         
                         <p th:if="${!note.isTodo}" class="card-text" th:text="${note.content}">Isi catatan...</p>
@@ -60,5 +75,66 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleFormMode(isTodoChecked) {
+            const textSection = document.getElementById('text-note-section');
+            const todoSection = document.getElementById('todo-note-section');
+            const textContent = document.getElementById('textContent');
+
+            if (isTodoChecked) {
+                textSection.style.display = 'none';
+                todoSection.style.display = 'block';
+                textContent.removeAttribute('name'); 
+            } else {
+                textSection.style.display = 'block';
+                todoSection.style.display = 'none';
+                textContent.setAttribute('name', 'content');
+            }
+        }
+
+        function addTodoField() {
+            const container = document.getElementById('todo-inputs-container');
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2 todo-input-item';
+            
+            const count = container.getElementsByClassName('todo-input-item').length + 1;
+            div.innerHTML = `
+                <span class="input-group-text">☐</span>
+                <input type="text" class="form-control todo-item-field" placeholder="Item todo ${count}...">
+            `;
+            container.appendChild(div);
+        }
+
+        function prepareSubmit(event) {
+            const isTodoChecked = document.getElementById('isTodo').checked;
+            
+            if (isTodoChecked) {
+                event.preventDefault(); 
+                const fields = document.getElementsByClassName('todo-item-field');
+                let values = [];
+                
+                for (let i = 0; i < fields.length; i++) {
+                    if (fields[i].value.trim() !== "") {
+                        values.push(fields[i].value.replace(/,/g, ' ')); 
+                    }
+                }
+                
+                if (values.length === 0) {
+                    alert("Isi minimal satu item todo Cang!");
+                    return;
+                }
+
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'content';
+                hiddenInput.value = values.join(','); 
+                
+                const form = document.getElementById('mainForm');
+                form.appendChild(hiddenInput);
+                form.submit(); 
+            }
+        }
+    </script>
 </body>
 </html>
