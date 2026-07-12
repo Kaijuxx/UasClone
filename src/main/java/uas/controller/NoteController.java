@@ -26,7 +26,6 @@ public class NoteController {
         try {
             noteService.saveNote(note);
         } catch (IllegalArgumentException e) {
-            // Validasi gagal dialihkan kembali ke halaman utama
         }
         return "redirect:/";
     }
@@ -40,7 +39,6 @@ public class NoteController {
     @GetMapping("/edit/{id}")
     public String editNote(@PathVariable Long id, Model model) {
         model.addAttribute("notes", noteService.getAllNotes());
-        // Ambil data lama berdasarkan ID, kalau ga ketemu bikin Note baru biar ga crash
         model.addAttribute("newNote", noteService.getAllNotes().stream()
                 .filter(n -> n.getId().equals(id)).findFirst().orElse(new Note()));
         return "index";
