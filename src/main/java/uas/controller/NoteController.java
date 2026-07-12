@@ -37,6 +37,15 @@ public class NoteController {
         return "redirect:/";
     }
 
+    @GetMapping("/edit/{id}")
+    public String editNote(@PathVariable Long id, Model model) {
+        model.addAttribute("notes", noteService.getAllNotes());
+        // Ambil data lama berdasarkan ID, kalau ga ketemu bikin Note baru biar ga crash
+        model.addAttribute("newNote", noteService.getAllNotes().stream()
+                .filter(n -> n.getId().equals(id)).findFirst().orElse(new Note()));
+        return "index";
+    }
+
     @GetMapping("/pin/{id}")
     public String pinNote(@PathVariable Long id) {
         noteService.togglePin(id);

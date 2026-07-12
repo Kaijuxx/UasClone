@@ -8,21 +8,32 @@
     <div class="container" style="max-width: 800px;">
         <h1 class="text-center mb-4">💡 Keep Clone</h1>
 
-        <!-- Form Tambah Catatan -->
+        <!-- Form Tambah / Edit Catatan -->
         <div class="card p-3 mb-4 shadow-sm">
+            <h5 class="mb-2 text-secondary" th:text="${newNote.id != null} ? 'Edit Catatan' : 'Tambah Catatan'">Tambah Catatan</h5>
             <form th:action="@{/save}" th:object="${newNote}" method="POST" id="mainForm">
+                <input type="hidden" th:field="*{id}">
+
                 <input type="text" th:field="*{title}" class="form-control mb-2" placeholder="Judul..." required>
                 
                 <div id="text-note-section">
-                    <textarea id="textContent" name="content" class="form-control mb-2" placeholder="Tulis catatan..."></textarea>
+                    <textarea id="textContent" th:field="*{content}" class="form-control mb-2" placeholder="Tulis catatan..."></textarea>
                 </div>
                 
                 <div id="todo-note-section" class="mb-2" style="display: none;">
                     <div id="todo-inputs-container">
-                        <div class="input-group mb-2 todo-input-item">
-                            <span class="input-group-text">☐</span>
-                            <input type="text" class="form-control todo-item-field" placeholder="Item todo 1...">
-                        </div>
+                        <th:block th:if="${newNote.isTodo && newNote.content != null}">
+                            <div th:each="item, iter : ${#strings.arraySplit(newNote.content, ',')}" class="input-group mb-2 todo-input-item">
+                                <span class="input-group-text">☐</span>
+                                <input type="text" class="form-control todo-item-field" th:value="${item}" th:placeholder="'Item todo ' + ${iter.count}">
+                            </div>
+                        </th:block>
+                        <th:block th:if="${!newNote.isTodo || newNote.content == null}">
+                            <div class="input-group mb-2 todo-input-item">
+                                <span class="input-group-text">☐</span>
+                                <input type="text" class="form-control todo-item-field" placeholder="Item ToDo...">
+                            </div>
+                        </th:block>
                     </div>
                     <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addTodoField()">+ Tambah Item Todo</button>
                 </div>
@@ -39,10 +50,10 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-warning w-100 fw-bold" onclick="prepareSubmit(event)">Simpan</button>
+                <a th:if="${newNote.id != null}" th:href="@{/}" class="btn btn-light w-100 btn-sm mt-1 text-secondary">Batal Edit</a>
             </form>
         </div>
 
-        <!-- List Catatan -->
         <div class="row">
             <div class="col-md-6 mb-3" th:each="note : ${notes}">
                 <div class="card shadow-sm" th:classappend="${note.isPinned} ? 'border-warning border-2' : ''">
@@ -68,6 +79,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-1">
+                            <a th:href="@{'/edit/' + ${note.id}}" class="btn btn-outline-primary btn-sm">Edit</a>
                             <a th:href="@{'/delete/' + ${note.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Hapus catatan ini?')">Hapus</a>
                         </div>
                     </div>
@@ -75,6 +87,7 @@
             </div>
         </div>
     </div>
+
 
     <script>
         function toggleFormMode(isTodoChecked) {
@@ -121,7 +134,7 @@
                 }
                 
                 if (values.length === 0) {
-                    alert("Isi minimal satu item todo Cang!");
+                    alert("Isi minimal satu item ToDo!");
                     return;
                 }
 
@@ -135,6 +148,11 @@
                 form.submit(); 
             }
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const isTodoChecked = document.getElementById('isTodo').checked;
+            toggleFormMode(isTodoChecked);
+        });
     </script>
 </body>
 </html>
