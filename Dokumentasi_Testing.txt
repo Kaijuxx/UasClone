@@ -1,0 +1,76 @@
+PROJECT KEEP CLONE (Spring Boot Monolith)
+
+Pengujian berdasarkan dengan :
+- JUnit 5
+- Mocking Testing
+- Unit Testing 
+- Code Coverege
+
+(DB menggunkan MySQL)
+
+FILE YANG DI UJI
+File : src/main/java/uas/service/NoteService.Java
+Skenario pengujian:
+1. Membuat Catatan Baru (testCreateCatatan_Sukses)
+2. Mengambil & Mengurutkan Seluruh Catatan (testGetAllNotes_Sukses)
+3. Mengubah / Edit Isi Catatan (testUpdateCatatan_Sukses)
+4. Mengubah Status Checkbox To-Do List (testToggleTodo_MengubahStatusSelesai)
+5. Mengubah Status Semat/Pin Catatan (testTogglePin_MengubahStatusSemat)
+6. Menyimpan Waktu Pengingat / Reminder (testFiturPengingat_PastikanWaktuTersimpan)
+7. Menghapus Catatan dari Sistem (testDeleteCatatan_Sukses)
+
+Total test: 7 Skenario Utama Logika Sistem
+
+MOCKING 
+Repository di Mock penuh menggunakan Mockingtest agar pengujian tidak menggunakan data asli agar tidak memengaruhi data base asli
+Contoh implementasi pada kode Java:
+
+  @Mock
+  private NoteRepository noteRepository;
+
+  @InjectMocks
+  private NoteService noteService;
+
+Maka pengujian hanya menggunakan/memverifkasi aliran pada service layer yang nantinya di lempar ke controller dan UI (HTML)
+
+CARA MENJALANKAN TESTING
+Menjalankan seluruh unit test lewat terminal:
+$ mvn test
+
+Menjalankan test beserta kalkulasi coverage:
+$ mvn clean test jacoco:report
+
+HASIL PENGUJIAN 
+Results:
+
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time:  20.071 s
+Finished at: 2026-07-13T09:09:28+08:00
+------------------------------------------------------------------------
+
+Total Keberhasilan:
+- Test Suites: 1 Class passed (NoteServiceTest)
+- Tests      : 7 Methods passed
+
+Hasil Code Coverage Layer Service:
+- Class Coverage  : 100%
+- Method Coverage : 100%
+- Line Coverage   : > 90%
+
+KESIMPULAN
+Seluruh fungsi logika utama pada NoteService berhasil diuji 
+menggunakan Unit Testing dengan JUnit 5 dan Mockito.
+
+Pengujian berhasil memastikan bahwa:
+1. Service layer dapat mengolah data objek catatan dengan benar 
+   sebelum dirender ke halaman web.
+2. Logika pengurutan data catatan berdasarkan pin terbanyak dan ID 
+   terbaru via findAllByOrderByIsPinnedDescIdDesc() berjalan dengan mulus.
+3. Fitur interaktif web seperti klik Toggle Pin, Reminder, dan 
+   Toggle To-Do memiliki validasi logika yang kuat.
+4. Objek database berhasil di-mock secara sempurna sehingga proses 
+   testing mandiri dan tidak bergantung pada kondisi database MySQL lokal.

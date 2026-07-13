@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: uas.service.NoteServiceTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.381 s -- in uas.service.NoteServiceTest
