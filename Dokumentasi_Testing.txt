@@ -61,6 +61,10 @@ Hasil Code Coverage Layer Service:
 - Method Coverage : 100%
 - Line Coverage   : > 90%
 
+
+Alasan JUnit 5 dan Mockito di jadikan satu dalam pengujian ini adalah bertujuan untuk melakukan isolasi pengujian (isolated unit testing), di mana JUnit 5 berperan sebagai eksekutor untuk memvalidasi hasil akhir kode (assert), sementara Mockito bertugas menyediakan repository tiruan (mocking) di dalam memori. Dengan menyatukan kedua framework ini, pengujian logika bisnis pada NoteService dapat berjalan secara mandiri dengan efisiensi tinggi (dalam hitungan milidetik) karena seluruh data diolah langsung di RAM, sekaligus menghilangkan ketergantungan penuh terhadap status aktif maupun konfigurasi database MySQL fisik di lingkungan lokal.
+
+
 KESIMPULAN
 Seluruh fungsi logika utama pada NoteService berhasil diuji 
 menggunakan Unit Testing dengan JUnit 5 dan Mockito.
